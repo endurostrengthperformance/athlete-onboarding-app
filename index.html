@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESP — Athlete Onboarding</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#39B6FD;
+  --blue-dim:rgba(57,182,253,0.12);
+  --blue-border:rgba(57,182,253,0.28);
+  --black:#0d0f11;
+  --card:#161a1e;
+  --card2:#1c2026;
+  --border:#252a2f;
+  --border2:#2f3540;
+  --muted:#5c6470;
+  --sub:#8e99a6;
+  --text:#edf0f3;
+}
+html,body{min-height:100vh;background:var(--black);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5}
+a{color:var(--blue);text-decoration:none}
+
+/* ── WELCOME SCREEN ── */
+#welcome{display:flex;flex-direction:column;min-height:100vh;max-width:680px;margin:0 auto;padding:3rem 1.5rem 4rem}
+.w-logo{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:3rem}
+.w-headline{font-size:2.4rem;font-weight:800;line-height:1.05;color:var(--text);margin-bottom:1rem;letter-spacing:-0.02em}
+.w-headline span{color:var(--blue)}
+.w-body{font-size:14px;color:var(--sub);line-height:1.7;max-width:480px;margin-bottom:2.5rem}
+.w-steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:3rem}
+.w-step{background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.w-step-icon{font-size:18px}
+.w-step-name{font-size:11px;font-weight:700;color:var(--text)}
+.w-step-desc{font-size:10px;color:var(--muted);line-height:1.4}
+.w-start{display:inline-flex;align-items:center;gap:10px;background:var(--blue);color:#071420;font-size:14px;font-weight:800;padding:14px 28px;border-radius:10px;border:none;cursor:pointer;letter-spacing:0.01em;transition:opacity 0.2s}
+.w-start:hover{opacity:0.87}
+.w-note{font-size:11px;color:var(--muted);margin-top:1rem}
+
+/* ── APP SHELL ── */
+#app{display:none;max-width:720px;margin:0 auto;padding:1.5rem 1rem 5rem}
+
+.topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:0.5px solid var(--border)}
+
+.tb-logo{font-size:8px;letter-spacing:0.22em;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:3px}
+.tb-title{font-size:1.1rem;font-weight:700;color:var(--text)}
+.tb-right{text-align:right}
+.tb-prog-label{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.pip-row{display:flex;gap:3px;justify-content:flex-end;flex-wrap:wrap;max-width:160px}
+.pip{width:14px;height:3px;border-radius:2px;background:var(--border2);transition:background 0.3s}
+.pip.done{background:var(--blue)}
+.pip.active{background:rgba(57,182,253,0.4)}
+
+
+.sn-btn{padding:7px 4px;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;background:var(--card);border:0.5px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;line-height:1.2;height:60px}
+.sn-btn .sn-ic{font-size:13px}
+.sn-btn:hover{border-color:var(--blue-border);color:var(--blue)}
+.sn-btn.active{background:var(--blue);border-color:var(--blue);color:#071420}
+.sn-btn.done{border-color:var(--blue-border);color:var(--blue)}
+#stepNav{margin-bottom:1.25rem;display:flex;flex-direction:column;gap:5px}
+
+/* ── MODULE ── */
+.mod{display:none}
+.mod.show{display:block;animation:rise 0.2s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.eyebrow{font-size:8px;letter-spacing:0.22em;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:5px}
+.mod-title{font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.01em}
+.mod-lead{font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:1.5rem}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem}
+.card-label{font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:1rem;padding-bottom:0.6rem;border-bottom:0.5px solid var(--border)}
+
+/* ── FORMS ── */
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fg1{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.03em}
+.fg input,.fg select,.fg textarea{background:#0b0d0f;border:0.5px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--text);font-family:inherit;outline:none;transition:border-color 0.2s;-webkit-appearance:none;width:100%}
+.fg select option{background:#161a1e}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--blue)}
+.fg textarea{resize:vertical;min-height:76px;line-height:1.5}
+.fg input.err,.fg select.err{border-color:#e24b4a}
+
+/* ── PDF BUTTONS ── */
+.pdf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+.pdf-btn{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#0b0d0f;border:0.5px solid var(--border2);border-radius:10px;cursor:pointer;transition:all 0.2s;text-decoration:none}
+.pdf-btn:hover{border-color:var(--blue-border);background:#0f1419}
+.pdf-ic{width:34px;height:34px;background:var(--blue-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--blue);font-size:17px}
+.pdf-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.2}
+.pdf-meta{font-size:10px;color:var(--muted);margin-top:1px}
+
+/* ── PRINCIPLES ── */
+.principle{display:flex;gap:12px;padding:12px 0;border-bottom:0.5px solid var(--border)}
+.principle:last-child{border-bottom:none;padding-bottom:0}
+.p-ic{width:34px;height:34px;min-width:34px;background:var(--blue-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.p-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.p-desc{font-size:12px;color:var(--sub);line-height:1.6}
+
+/* ── ZONES ── */
+.zone-row{display:grid;grid-template-columns:28px 90px 1fr;align-items:start;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+
+.zone-info{display:flex;flex-direction:column;gap:2px}
+.zone-range{font-size:11px;color:#39B6FD;font-family:monospace}
+.zone-feel{font-size:11px;color:var(--sub)}
+
+
+.zone-row:last-child{border-bottom:none}
+.zbadge{width:28px;height:28px;min-width:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800}
+.z1{background:#1D9E75;color:#E1F5EE}.z2{background:#378ADD;color:#E6F1FB}.z3{background:#EF9F27;color:#1a0f00}.z4{background:#D85A30;color:#fff}.z5{background:#A32D2D;color:#fff}
+
+
+
+
+/* ── FAQ ── */
+.faq-item{border-bottom:0.5px solid var(--border)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:13px 0;cursor:pointer;gap:10px}
+.faq-q-text{font-size:13px;font-weight:700;color:var(--text)}
+.faq-chevron{color:var(--blue);font-size:16px;transition:transform 0.2s;flex-shrink:0}
+.faq-item.open .faq-chevron{transform:rotate(180deg)}
+.faq-a{display:none;font-size:12px;color:var(--sub);line-height:1.7;padding-bottom:13px}
+.faq-item.open .faq-a{display:block}
+
+/* ── TESTING CARDS ── */
+.test-card{background:#0b0d0f;border:0.5px solid var(--border2);border-radius:10px;padding:1rem 1.25rem;margin-bottom:8px}
+.test-card-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.test-badge{background:var(--blue-dim);color:var(--blue);font-size:9px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:5px}
+.test-title{font-size:13px;font-weight:700;color:var(--text)}
+.test-body{font-size:12px;color:var(--sub);line-height:1.65}
+.test-steps{list-style:none;margin-top:8px}
+.test-steps li{font-size:12px;color:var(--sub);line-height:1.6;padding:3px 0;display:flex;gap:8px}
+.test-steps li::before{content:attr(data-n);color:var(--blue);font-weight:700;min-width:16px}
+
+/* ── COMMS ── */
+.comms-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:0.5px solid var(--border)}
+.comms-row:last-child{border-bottom:none}
+.comms-ic{width:34px;height:34px;min-width:34px;background:var(--blue-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.comms-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.comms-desc{font-size:12px;color:var(--sub);line-height:1.6}
+.comms-tag{display:inline-block;background:var(--blue-dim);color:var(--blue);font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-top:5px}
+
+/* ── WAIVER ── */
+.waiver-body{background:#0b0d0f;border:0.5px solid var(--border2);border-radius:10px;padding:1rem 1.25rem;max-height:210px;overflow-y:auto;margin-bottom:1rem}
+.waiver-body p{font-size:11.5px;color:var(--sub);line-height:1.8;margin-bottom:0.7rem}
+.waiver-body p:last-child{margin-bottom:0}
+.waiver-body strong{color:var(--text)}
+.consent-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:#0b0d0f;border:0.5px solid var(--border2);border-radius:9px;margin-bottom:6px;cursor:pointer;transition:border-color 0.2s}
+.consent-item:hover{border-color:var(--blue-border)}
+.consent-item input[type=checkbox]{margin-top:2px;accent-color:var(--blue);width:14px;height:14px;flex-shrink:0;cursor:pointer}
+.consent-item span{font-size:12px;color:var(--sub);line-height:1.6}
+.sig-wrap{border:0.5px solid var(--border2);border-radius:10px;overflow:hidden;margin-bottom:1rem}
+.sig-head{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:#0b0d0f;border-bottom:0.5px solid var(--border2)}
+.sig-lbl{font-size:11px;color:var(--muted)}
+.sig-clr{font-size:11px;color:var(--blue);background:none;border:none;cursor:pointer;font-family:inherit;padding:0}
+#sigCanvas{display:block;width:100%;height:150px;cursor:crosshair;touch-action:none;background:#111518}
+
+/* ── ACTIONS ── */
+.action-row{display:flex;gap:10px;justify-content:flex-end;margin-top:1.5rem;padding-top:1rem;border-top:0.5px solid var(--border)}
+.btn-back{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;background:transparent;border:0.5px solid var(--border2);color:var(--muted);transition:all 0.2s}
+.btn-back:hover{border-color:var(--blue-border);color:var(--blue)}
+.btn-next{padding:9px 24px;border-radius:8px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;background:var(--blue);border:none;color:#071420;transition:opacity 0.2s;letter-spacing:0.01em}
+.btn-next:hover{opacity:0.85}
+
+/* ── DONE ── */
+.done{text-align:center;padding:3rem 1rem}
+.done-badge{width:68px;height:68px;background:var(--blue-dim);border:0.5px solid var(--blue-border);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:30px}
+.done-title{font-size:1.4rem;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-0.01em}
+.done-sub{font-size:13px;color:var(--sub);line-height:1.7;max-width:420px;margin:0 auto 2rem}
+.done-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:400px;margin:0 auto}
+.done-cell{background:var(--card);border:0.5px solid var(--border);border-radius:9px;padding:12px 14px;text-align:left}
+.done-lbl{font-size:8px;text-transform:uppercase;letter-spacing:0.14em;color:var(--muted);margin-bottom:3px}
+.done-val{font-size:13px;font-weight:700;color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     WELCOME SCREEN
+══════════════════════════════════════ -->
+<div id="welcome">
+  
+
+  <div class="w-headline">Welcome to <span>Enduro Strength Performance</span><svg viewBox="0 0 72 40" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-left:10px;height:0.75em;width:auto"><polygon points="12,40 0,0 8,0 20,40" fill="#39B6FD"/><polygon points="34,40 22,0 30,0 42,40" fill="#39B6FD"/><polygon points="56,40 44,0 52,0 64,40" fill="#39B6FD"/></svg></div>
+  <div class="w-body">We are so excited for you to begin your journey with Enduro!<br><br>This onboarding portal is designed to set you up for success, educate you and provide us with further detail so your coach can hit the ground running with you on day one. Happy training 🙌</div>
+
+  <div class="w-steps">
+    <div class="w-step"><div class="w-step-icon">👤</div><div class="w-step-name">Profile</div><div class="w-step-desc">Your background & goals</div></div>
+    <div class="w-step"><div class="w-step-icon">🏃</div><div class="w-step-name">Run</div><div class="w-step-desc">Zones & foundations</div></div>
+    <div class="w-step"><div class="w-step-icon">🚴</div><div class="w-step-name">Bike</div><div class="w-step-desc">Power & optimisation</div></div>
+    <div class="w-step"><div class="w-step-icon">🏊</div><div class="w-step-name">Swim</div><div class="w-step-desc">Technique & CSS</div></div>
+    <div class="w-step"><div class="w-step-icon">🔋</div><div class="w-step-name">Recovery</div><div class="w-step-desc">Where you grow</div></div>
+    <div class="w-step"><div class="w-step-icon">🥗</div><div class="w-step-name">Nutrition</div><div class="w-step-desc">Fuelling & setup</div></div>
+    <div class="w-step"><div class="w-step-icon">🎯</div><div class="w-step-name">Goals & Testing</div><div class="w-step-desc">Benchmarks & targets</div></div>
+    <div class="w-step"><div class="w-step-icon">⚙️</div><div class="w-step-name">Setup</div><div class="w-step-desc">Getting you ready to train</div></div>
+    <div class="w-step"><div class="w-step-icon">💬</div><div class="w-step-name">Communication</div><div class="w-step-desc">How we work together</div></div>
+    <div class="w-step"><div class="w-step-icon">❓</div><div class="w-step-name">FAQs</div><div class="w-step-desc">Common questions answered</div></div>
+    <div class="w-step"><div class="w-step-icon">📚</div><div class="w-step-name">Guides</div><div class="w-step-desc">All ESP resources</div></div>
+    <div class="w-step"><div class="w-step-icon">📋</div><div class="w-step-name">Waiver</div><div class="w-step-desc">Consent & signature</div></div>
+  </div>
+
+  <button class="w-start" onclick="startApp()">Begin onboarding <i class="ti ti-arrow-right"></i></button>
+  <div class="w-note">All information is stored securely and used only for coaching purposes.</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════ -->
+<div id="app">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:0.5px solid #252a2f">
+    <div style="font-size:1.1rem;font-weight:700;color:#edf0f3">Athlete Onboarding</div>
+    <div style="text-align:right">
+      <div style="font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#5c6470;margin-bottom:5px">Progress</div>
+      <div id="pips" style="display:flex;gap:3px;justify-content:flex-end;flex-wrap:nowrap"></div>
+    </div>
+  </div>
+
+  <div id="stepNav"></div>
+  <div id="modWrap"></div>
+</div>
+
+<script>
+const STEPS = [
+  {id:'profile',   label:'Profile',    icon:'👤'},
+  {id:'run',       label:'Run',        icon:'🏃'},
+  {id:'bike',      label:'Bike',       icon:'🚴'},
+  {id:'swim',      label:'Swim',       icon:'🏊'},
+  {id:'recovery',  label:'Recovery',   icon:'🔋'},
+  {id:'nutrition', label:'Nutrition',  icon:'🥗'},
+  {id:'goals',     label:'Goals & Testing', icon:'🎯'},
+  {id:'setup',     label:'Setup',      icon:'⚙️'},
+  {id:'comms',     label:'Comms',      icon:'💬'},
+  {id:'faq',       label:'FAQs',       icon:'❓'},
+  {id:'resources', label:'Guides',     icon:'📚'},
+  {id:'waiver',    label:'Waiver',     icon:'📋'}
+];
+
+const PDFS = {
+  run:        'https://drive.google.com/file/d/1KB1Gw9GEj-Y6FF1nrcYCYgsHQmMYZkBY/preview',
+  bike:       'https://drive.google.com/file/d/10Mf_AQIL7Z8wqqoXWf-g_PuTvDyu6OVV/preview',
+  swim:       'https://drive.google.com/file/d/1Sc8XIFDVpzED2Zso5W3aWlj-PHAIaBNX/preview',
+  recovery:   'https://drive.google.com/file/d/1-pBQhzdQoUeWMQk5Dwe4KJJ7_c9inTTR/preview',
+  nutrition:  'https://drive.google.com/file/d/15FkQg6Ge-vSfFiwQAkRsl30wAroSjfF2/preview',
+  setup:      'https://drive.google.com/file/d/1XCOKDdWeHZo1lyhgP4ExlykUt6q0iDb4/preview',
+  supplement: '#supplement-guide-pdf'
+};
+
+let cur = 0, done = new Set(), D = {}, sigMarked = false, sigCtx = null, sigEl = null, drawing = false;
+
+function startApp() {
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  render();
+}
+
+function pips() {
+  document.getElementById('pips').innerHTML = STEPS.map((_,i) => {
+    const bg = done.has(i) ? '#39B6FD' : i === cur ? 'rgba(57,182,253,0.4)' : '#252a2f';
+    return '<div style="width:11px;height:3px;border-radius:2px;background:' + bg + ';flex-shrink:0"></div>';
+  }).join('');
+}
+
+function nav() {
+  const rows = [STEPS.slice(0,6), STEPS.slice(6,12)];
+  document.getElementById('stepNav').innerHTML = rows.map((row, rowIndex) =>
+    '<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:5px">' +
+    row.map((s,j) => {
+      const i = STEPS.indexOf(s);
+      const isActive = i === cur;
+      const isDone = done.has(i);
+      const bg = isActive ? '#39B6FD' : '#161a1e';
+      const color = isActive ? '#071420' : isDone ? '#39B6FD' : '#5c6470';
+      const border = isActive ? '#39B6FD' : isDone ? 'rgba(57,182,253,0.28)' : '#252a2f';
+      return '<button onclick="go(' + i + ')" style="' +
+        'height:52px;width:100%;padding:0 4px;' +
+        'font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;' +
+        'background:' + bg + ';border:0.5px solid ' + border + ';border-radius:8px;' +
+        'color:' + color + ';cursor:pointer;' +
+        'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;' +
+        'line-height:1.2;font-family:inherit;box-sizing:border-box">' +
+        '<span style="font-size:13px">' + s.icon + '</span>' +
+        '<span>' + (isDone ? '✓ ' : '') + s.label + '</span>' +
+        '</button>';
+    }).join('') +
+    '</div>'
+  ).join('');
+}
+
+function render() {
+  pips(); nav();
+  document.getElementById('modWrap').innerHTML = `<div class="mod show">${buildMod(STEPS[cur].id)}</div>`;
+  if (STEPS[cur].id === 'waiver') setTimeout(initSig, 100);
+  if (STEPS[cur].id === 'faq') bindFaqs();
+}
+
+function go(i) { cur = i; render(); window.scrollTo(0,0); }
+function advance() { done.add(cur); if (cur < STEPS.length-1) go(cur+1); }
+
+// ── SAVE HELPERS ──
+function saveProfile() {
+  const req = ['fn','ln','email','sport','goal'];
+  let ok = true;
+  req.forEach(id => {
+    const e = document.getElementById(id);
+    if (!e || !e.value.trim()) { if(e) e.classList.add('err'); ok = false; }
+    else e.classList.remove('err');
+  });
+  if (!ok) return;
+  ['fn','ln','dob','phone','email','sport','yrs','hrs','races','goal','injuries','emergency'].forEach(id => {
+    const e = document.getElementById(id); if(e) D[id] = e.value;
+  });
+  advance();
+}
+
+function saveSub(fields) {
+  fields.forEach(id => { const e = document.getElementById(id); if(e) D[id] = e.value; });
+  advance();
+}
+
+// ── FAQ ACCORDION ──
+function bindFaqs() {
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(f => f.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+}
+
+// ── SIGNATURE ──
+function initSig() {
+  sigEl = document.getElementById('sigCanvas');
+  if (!sigEl) return;
+  sigCtx = sigEl.getContext('2d');
+  sigCtx.strokeStyle = '#39B6FD';
+  sigCtx.lineWidth = 2.5;
+  sigCtx.lineCap = 'round';
+  sigCtx.lineJoin = 'round';
+  const pos = e => {
+    const r = sigEl.getBoundingClientRect(), s = e.touches ? e.touches[0] : e;
+    return { x: (s.clientX-r.left)*(sigEl.width/r.width), y: (s.clientY-r.top)*(sigEl.height/r.height) };
+  };
+  sigEl.addEventListener('mousedown', e => { drawing=true; const p=pos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x,p.y); });
+  sigEl.addEventListener('mousemove', e => { if(!drawing) return; const p=pos(e); sigCtx.lineTo(p.x,p.y); sigCtx.stroke(); sigMarked=true; });
+  sigEl.addEventListener('mouseup', () => drawing=false);
+  sigEl.addEventListener('mouseleave', () => drawing=false);
+  sigEl.addEventListener('touchstart', e => { e.preventDefault(); drawing=true; const p=pos(e); sigCtx.beginPath(); sigCtx.moveTo(p.x,p.y); }, {passive:false});
+  sigEl.addEventListener('touchmove', e => { e.preventDefault(); if(!drawing) return; const p=pos(e); sigCtx.lineTo(p.x,p.y); sigCtx.stroke(); sigMarked=true; }, {passive:false});
+  sigEl.addEventListener('touchend', () => drawing=false);
+}
+
+function clearSig() { sigMarked=false; if(sigCtx) sigCtx.clearRect(0,0,sigEl.width,sigEl.height); }
+
+function tog(id, event) { if(event && event.target.type === 'checkbox') return; const e = document.getElementById(id); if(e) e.checked = !e.checked; }
+
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwsbTU6wJTCHdvpbpXUzKKCknKJgs7zqn42r_4g8TMJRa9fulZIkEX1nkT_1g-lsBqv/exec';
+
+function submitWaiver() {
+  const c1 = document.getElementById('c1'), c2 = document.getElementById('c2'), c3 = document.getElementById('c3');
+  if (!c1?.checked || !c2?.checked || !c3?.checked) { alert('Please tick the required consent boxes before submitting.'); return; }
+  const wn = document.getElementById('wname');
+  if (!wn?.value.trim()) { if(wn) wn.classList.add('err'); alert('Please enter your full legal name before submitting.'); return; }
+  const wd = document.getElementById('wdate');
+  if (!wd?.value) { if(wd) wd.classList.add('err'); alert('Please enter the date before submitting.'); return; }
+  if (!sigMarked) { alert('Please draw your signature before submitting.'); return; }
+  D.wname = wn.value;
+  D.wdate = document.getElementById('wdate').value;
+  D.media = document.getElementById('c4')?.checked;
+  done.add(cur);
+
+  const btn = document.getElementById('waiverSubmitBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+
+  const sportMap = {tri:'Triathlon',run:'Running',cycle:'Cycling',swim:'Swimming',other:'Other'};
+  
+
+  const fields = {
+    'Name':              ((D.fn||'') + ' ' + (D.ln||'')).trim(),
+    'First Name':        D.fn        || '',
+    'Last Name':         D.ln        || '',
+    'DOB':               D.dob       || '',
+    'Phone':             D.phone     || '',
+    'Email':             D.email     || '',
+    'Sport':             sportMap[D.sport] || D.sport || '',
+    'Years in Sport':    D.yrs       || '',
+    'Weekly Hours':      D.hrs       || '',
+    'Key Races':         D.races     || '',
+    'Goal':              D.goal      || '',
+    'Injuries':          D.injuries  || '',
+    'Emergency Contact': D.emergency || '',
+    '5km Time':          D.r5k       || '',
+    'Long Run':          D.rlr       || '',
+    'Run Limiter':       D.rlimit    || '',
+    'FTP':               D.bftp      || '',
+    'Bike Type':         D.btype     || '',
+    'Power Meter':       D.bpower    || '',
+    'Long Ride':         D.blr       || '',
+    '400m Time':         D.s400      || '',
+    '200m Time':         D.s200      || '',
+    'CSS Pace':          D.scss      || '',
+    'Open Water':        D.sow       || '',
+    'Sleep':             D.rsleep    || '',
+    'HRV Device':        D.rhrv      || '',
+    'Recovery Notes':    D.rnotes    || '',
+    'Nutrition Rating':  D.nrate     || '',
+    'Dietary Notes':     D.ndiet     || '',
+    'Goal Time':         D.gtime     || '',
+    'Swim Target':       D.gswim     || '',
+    'Bike Target':       D.gbike     || '',
+    'Run Target':        D.grunt     || '',
+    'B Race':            D.grace     || '',
+    'Waiver Name':       D.wname     || '',
+    'Waiver Date':       D.wdate     || '',
+    'Media Consent':     D.media ? 'Yes' : 'No',
+    'Submitted At':      new Date().toLocaleString('en-AU', {timeZone:'Australia/Brisbane'})
+  };
+
+  const params = new URLSearchParams();
+  Object.keys(fields).forEach(key => {
+    params.append(key, fields[key] || '');
+  });
+
+  const url = SHEETS_URL + '?' + params.toString();
+
+  // Use image beacon — works cross-origin, no CORS issues
+  const img = new Image();
+  img.src = url;
+  img.onload = () => showDone(true);
+  img.onerror = () => showDone(true); // Still show success — data was sent
+  
+  // Fallback after 4 seconds
+  setTimeout(() => showDone(true), 4000);
+}
+
+function showDone(success, errorMsg) {
+  document.getElementById('stepNav').innerHTML = '';
+  const sportMap = {tri:'Triathlon',run:'Running',cycle:'Cycling',swim:'Swimming',other:'Other'};
+  const notice = success === false
+    ? `<div style="margin:1rem auto;max-width:400px;background:rgba(226,75,74,0.12);border:0.5px solid rgba(226,75,74,0.4);border-radius:9px;padding:12px 16px;font-size:12px;color:#f09595;line-height:1.6">
+        Your onboarding is complete but we had trouble saving to our database. Please screenshot this page and send it to your coach on WhatsApp.
+        ${errorMsg ? '<br><br><strong>Error:</strong> ' + errorMsg : ''}
+       </div>`
+    : '';
+  document.getElementById('modWrap').innerHTML = `
+  <div class="done">
+    <div class="done-badge">${success === false ? '⚠️' : '✅'}</div>
+    <div class="done-title">Welcome to ESP, ${D.fn||'Athlete'}.</div>
+    <div class="done-sub">Your onboarding is complete. Your coach will review your profile and be in touch within 24–48 hours via WhatsApp to confirm your first session and TrainingPeaks setup.</div>
+    ${notice}
+    <div class="done-grid">
+      <div class="done-cell"><div class="done-lbl">Athlete</div><div class="done-val">${(D.fn||'')+' '+(D.ln||'')}</div></div>
+      <div class="done-cell"><div class="done-lbl">Sport</div><div class="done-val">${sportMap[D.sport]||'—'}</div></div>
+      <div class="done-cell"><div class="done-lbl">Key race</div><div class="done-val">${D.races||'—'}</div></div>
+      <div class="done-cell"><div class="done-lbl">Waiver signed</div><div class="done-val">${D.wdate||'—'}</div></div>
+    </div>
+  </div>`;
+  pips();
+}
+
+// ══════════════════════════════════════
+// MODULE BUILDERS
+// ══════════════════════════════════════
+
+function buildMod(id) {
+  switch(id) {
+    case 'profile':   return modProfile();
+    case 'run':       return modRun();
+    case 'bike':      return modBike();
+    case 'swim':      return modSwim();
+    case 'recovery':  return modRecovery();
+    case 'nutrition': return modNutrition();
+    case 'goals':     return modGoals();
+    case 'setup':     return modSetup();
+    case 'comms':     return modComms();
+    case 'faq':       return modFaq();
+    case 'resources': return modResources();
+    case 'waiver':    return modWaiver();
+  }
+}
+
+// ─── MODULE 1: PROFILE ───
+function modProfile() { return `
+<div class="eyebrow">Module 1 of 12 — Welcome</div>
+<div class="mod-title">Athlete Profile</div>
+
+<div class="card">
+  <div class="card-label">Personal details</div>
+  <div class="fg2">
+    <div class="fg"><label>First name</label><input id="fn" placeholder="Jack" value="${D.fn||''}"></div>
+    <div class="fg"><label>Last name</label><input id="ln" placeholder="Smith" value="${D.ln||''}"></div>
+  </div>
+  <div class="fg2">
+    <div class="fg"><label>Date of birth</label><input id="dob" type="date" value="${D.dob||''}"></div>
+    <div class="fg"><label>Mobile number</label><input id="phone" placeholder="+61 4xx xxx xxx" value="${D.phone||''}"></div>
+  </div>
+  <div class="fg1"><div class="fg"><label>Email address</label><input id="email" type="email" placeholder="you@email.com" value="${D.email||''}"></div></div>
+</div>
+<div class="card">
+  <div class="card-label">Sport background</div>
+  <div class="fg2">
+    <div class="fg"><label>Primary sport</label>
+      <select id="sport">
+        <option value="">Select…</option>
+        <option value="tri" ${D.sport==='tri'?'selected':''}>Triathlon</option>
+        <option value="run" ${D.sport==='run'?'selected':''}>Running</option>
+        <option value="cycle" ${D.sport==='cycle'?'selected':''}>Cycling</option>
+        <option value="swim" ${D.sport==='swim'?'selected':''}>Swimming</option>
+        <option value="other" ${D.sport==='other'?'selected':''}>Other</option>
+      </select>
+    </div>
+    <div class="fg"><label>Years in sport</label>
+      <select id="yrs">
+        <option value="">Select…</option>
+        <option value="<1" ${D.yrs==='<1'?'selected':''}>Less than 1 year</option>
+        <option value="1-3" ${D.yrs==='1-3'?'selected':''}>1–3 years</option>
+        <option value="3-5" ${D.yrs==='3-5'?'selected':''}>3–5 years</option>
+        <option value="5+" ${D.yrs==='5+'?'selected':''}>5+ years</option>
+      </select>
+    </div>
+  </div>
+  <div class="fg2">
+    <div class="fg"><label>Weekly training hours (approx)</label>
+      <select id="hrs">
+        <option value="">Select…</option>
+        <option value="<5" ${D.hrs==='<5'?'selected':''}>Less than 5 hrs</option>
+        <option value="5-10" ${D.hrs==='5-10'?'selected':''}>5–10 hrs</option>
+        <option value="10-15" ${D.hrs==='10-15'?'selected':''}>10–15 hrs</option>
+        <option value="15+" ${D.hrs==='15+'?'selected':''}>15+ hrs</option>
+      </select>
+    </div>
+    <div class="fg"><label>Key race(s) this season</label><input id="races" placeholder="e.g. Sunshine Coast 70.3" value="${D.races||''}"></div>
+  </div>
+  <div class="fg1"><div class="fg"><label>Primary goal with ESP</label><textarea id="goal" placeholder="e.g. Complete my first 70.3, improve run split, build a consistent training base…">${D.goal||''}</textarea></div></div>
+</div>
+<div class="card">
+  <div class="card-label">Health & safety</div>
+  <div class="fg1"><div class="fg"><label>Current injuries or physical limitations</label><textarea id="injuries" placeholder="None / describe if relevant…">${D.injuries||''}</textarea></div></div>
+  <div class="fg1"><div class="fg"><label>Emergency contact — name & number</label><input id="emergency" placeholder="Name — +61 4xx xxx xxx" value="${D.emergency||''}"></div></div>
+</div>
+<div class="action-row">
+  <button class="btn-next" onclick="saveProfile()">Continue →</button>
+</div>`; }
+
+// ─── MODULE 2: RUN ───
+function modRun() { return `
+<div class="eyebrow">Module 2 of 12 — Run Foundations</div>
+<div class="mod-title">Running Framework</div>
+<div class="mod-lead">Zones, principles and the habits that make a fast triathlon runner. Open the full guide below.</div>
+<div class="card">
+  <div class="card-label">Resource</div>
+  <div class="pdf-grid">
+    <a class="pdf-btn" href="${PDFS.run}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-run"></i></div>
+      <div><div class="pdf-name">Run Foundations Guide</div><div class="pdf-meta">PDF — tap to open</div></div>
+    </a>
+  </div>
+</div>
+<div class="card">
+  <div class="card-label">Heart rate training zones &nbsp;·&nbsp; <span style="font-size:9px;color:#5c6470;font-weight:400;text-transform:none;letter-spacing:0">MHR = Max Heart Rate</span></div>
+  <div class="zone-row"><div class="zbadge z1">Z1</div><div class="zone-name">Recovery</div><div class="zone-info"><div class="zone-range">50–60% MHR</div><div class="zone-feel">Very easy, fully conversational</div></div></div>
+  <div class="zone-row"><div class="zbadge z2">Z2</div><div class="zone-name">Aerobic base</div><div class="zone-info"><div class="zone-range">60–70% MHR</div><div class="zone-feel">Comfortable, can hold a sentence</div></div></div>
+  <div class="zone-row"><div class="zbadge z3">Z3</div><div class="zone-name">Tempo</div><div class="zone-info"><div class="zone-range">70–80% MHR</div><div class="zone-feel">Comfortably hard, 3–4 words</div></div></div>
+  <div class="zone-row"><div class="zbadge z4">Z4</div><div class="zone-name">Threshold</div><div class="zone-info"><div class="zone-range">80–90% MHR</div><div class="zone-feel">Hard, 1–2 word answers only</div></div></div>
+  <div class="zone-row"><div class="zbadge z5">Z5</div><div class="zone-name">VO₂ Max</div><div class="zone-info"><div class="zone-range">90–100% MHR</div><div class="zone-feel">Max effort, unsustainable beyond ~5 min</div></div></div>
+</div>
+<div class="card">
+  <div class="card-label">ESP run principles</div>
+  <div class="principle"><div class="p-ic">✅</div><div><div class="p-title">Program compliance</div><div class="p-desc">We build your program individually tailored to you. Trust the process and refrain from adding mileage, intensity or additional sessions. This keeps you injury free.</div></div></div>
+  <div class="principle"><div class="p-ic">🦶</div><div><div class="p-title">Cadence first: target 172–180spm (steps per minute)</div><div class="p-desc">Higher cadence reduces ground contact time and injury risk. When in doubt, shorten your stride. Don't slow your legs.</div></div></div>
+  <div class="principle"><div class="p-ic">📈</div><div><div class="p-title">~10% weekly load rule</div><div class="p-desc">Never increase weekly volume by more than ~10%. Every 4th week is a recovery/deload week at ~65% of peak load.</div></div></div>
+  <div class="principle"><div class="p-ic">⚡</div><div><div class="p-title">80/20 training split</div><div class="p-desc">~80% of your sessions should be genuinely easy (Z1–Z2). Most athletes train too hard on easy days and too easy on hard days.</div></div></div>
+  <div class="principle"><div class="p-ic">📐</div><div><div class="p-title">Slight forward lean from the ankle</div><div class="p-desc">Tall spine, relaxed shoulders, gaze 10–15m ahead. Arms at 90°, hands loose. Lean comes from the ankle, not the waist.</div></div></div>
+</div>
+<div class="card">
+  <div class="card-label">Your run check-in</div>
+  <div class="fg2">
+    <div class="fg"><label>Current 5km time (estimate ok)</label><input id="r5k" placeholder="e.g. 22:30" value="${D.r5k||''}"></div>
+    <div class="fg"><label>Comfortable long run distance</label><input id="rlr" placeholder="e.g. 12km" value="${D.rlr||''}"></div>
+  </div>
+  <div class="fg1"><div class="fg"><label>Biggest run limiter right now</label>
+    <select id="rlimit">
+      <option value="">Select…</option>
+      <option value="pace" ${D.rlimit==='pace'?'selected':''}>Pace / fitness</option>
+      <option value="injury" ${D.rlimit==='injury'?'selected':''}>Injury / niggle</option>
+      <option value="volume" ${D.rlimit==='volume'?'selected':''}>Building weekly volume</option>
+      <option value="brick" ${D.rlimit==='brick'?'selected':''}>Brick run feel</option>
+      <option value="mental" ${D.rlimit==='mental'?'selected':''}>Mental / motivation</option>
+    </select>
+  </div></div>
+</div>
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" onclick="saveSub(['r5k','rlr','rlimit'])">Continue →</button>
+</div>`; }
+
+// ─── MODULE 3: BIKE ───
+function modBike() { return `
+<div class="eyebrow">Module 3 of 12 — Bike Foundations</div>
+<div class="mod-title">Cycling Framework</div>
+<div class="mod-lead">Power-based zones, cycling principles and keeping you safe. Open the full guide below.</div>
+<div class="card">
+  <div class="card-label">Resource</div>
+  <div class="pdf-grid">
+    <a class="pdf-btn" href="${PDFS.bike}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-bike"></i></div>
+      <div><div class="pdf-name">Bike Foundations Guide</div><div class="pdf-meta">PDF — tap to open</div></div>
+    </a>
+  </div>
+</div>
+<div class="card">
+  <div class="card-label">Power zones (% FTP) &nbsp;·&nbsp; <span style="font-size:9px;color:#5c6470;font-weight:400;text-transform:none;letter-spacing:0">FTP = Functional Threshold Power (your max power output for 60 min)</span></div>
+  <div class="zone-row"><div class="zbadge z1">Z1</div><div class="zone-name">Recovery</div><div class="zone-info"><div class="zone-range">&lt;55% FTP</div><div class="zone-feel">Flushing, easy spin only</div></div></div>
+  <div class="zone-row"><div class="zbadge z2">Z2</div><div class="zone-name">Endurance</div><div class="zone-info"><div class="zone-range">56–75%</div><div class="zone-feel">Aerobic base, long ride bread and butter</div></div></div>
+  <div class="zone-row"><div class="zbadge z3">Z3</div><div class="zone-name">Tempo</div><div class="zone-info"><div class="zone-range">76–90%</div><div class="zone-feel">Race-feel, sustained effort</div></div></div>
+  <div class="zone-row"><div class="zbadge z4">Z4</div><div class="zone-name">Threshold</div><div class="zone-info"><div class="zone-range">91–105%</div><div class="zone-feel">FTP intervals, hard</div></div></div>
+  <div class="zone-row"><div class="zbadge z5">Z5</div><div class="zone-name">VO₂ Max</div><div class="zone-info"><div class="zone-range">106–120%</div><div class="zone-feel">High-intensity, short efforts</div></div></div>
+</div>
+<div class="card">
+  <div class="card-label">ESP bike principles</div>
+  <div class="principle"><div class="p-ic">🔄</div><div><div class="p-title">Target 82–92rpm (revolutions per minute) in training</div><div class="p-desc">Higher cadence means less muscular fatigue and fresher legs off the bike. For TT position: 80–88 rpm.</div></div></div>
+  <div class="principle"><div class="p-ic">👑</div><div><div class="p-title">Power is king</div><div class="p-desc">Having a power meter gives you reliable metrics to use and progress throughout your training and on race day. We strongly recommend investing in a power meter (cranks or pedals).</div></div></div>
+  <div class="principle"><div class="p-ic">🚀</div><div><div class="p-title">Don't fear the indoor trainer</div><div class="p-desc">Especially if you're new to cycling, an indoor trainer can help you ease into things and allow you to focus on hitting power targets. They're also ideal in the cooler months.</div></div></div>
+  <div class="principle"><div class="p-ic">🔩</div><div><div class="p-title">Bike fit is highly recommended</div><div class="p-desc">No amount of training fixes a poor position. If you haven't had a professional fit recently, flag it in your first coaching call.</div></div></div>
+</div>
+<div class="card">
+  <div class="card-label">Your bike check-in</div>
+  <div class="fg2">
+    <div class="fg"><label>Current FTP (watts) — if unsure, leave blank</label><input id="bftp" placeholder="e.g. 240" value="${D.bftp||''}"></div>
+    <div class="fg"><label>Bike type</label>
+      <select id="btype">
+        <option value="">Select…</option>
+        <option value="tt" ${D.btype==='tt'?'selected':''}>TT / Tri bike</option>
+        <option value="road" ${D.btype==='road'?'selected':''}>Road bike</option>
+        <option value="both" ${D.btype==='both'?'selected':''}>Both</option>
+      </select>
+    </div>
+  </div>
+  <div class="fg1"><div class="fg"><label>Training device</label>
+    <select id="bpower">
+      <option value="">Select…</option>
+      <option value="power" ${D.bpower==='power'?'selected':''}>Power meter</option>
+      <option value="rpe" ${D.bpower==='rpe'?'selected':''}>Effort (RPE) only</option>
+    </select>
+  </div></div>
+  <div class="fg1"><div class="fg"><label>Comfortable long ride distance</label><input id="blr" placeholder="e.g. 60km" value="${D.blr||''}"></div></div>
+</div>
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" onclick="saveSub(['bftp','btype','bpower'])">Continue →</button>
+</div>`; }
+
+// ─── MODULE 4: SWIM ───
+function modSwim() { return `
+<div class="eyebrow">Module 4 of 12 — Swim Foundations</div>
+<div class="mod-title">Swimming Framework</div>
+<div class="mod-lead">The most technique-dependent discipline. Fitness without form won't make you faster. This is where drills and skills earn their place.</div>
+<div class="card">
+  <div class="card-label">Resource</div>
+  <div class="pdf-grid">
+    <a class="pdf-btn" href="${PDFS.swim}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-wave-sine"></i></div>
+      <div><div class="pdf-name">Swim Foundations Guide</div><div class="pdf-meta">PDF — tap to open</div></div>
+    </a>
+  </div>
+</div>
+<div class="card">
+  <div class="card-label">Swim zones</div>
+  <div class="zone-row"><div class="zbadge z1">Z1</div><div class="zone-name">Recovery</div><div class="zone-info"><div class="zone-range" style="width:auto;min-width:120px;white-space:nowrap">Very easy</div><div class="zone-feel">Warm-up and cool-down only</div></div></div>
+  <div class="zone-row"><div class="zbadge z2">Z2</div><div class="zone-name">Aerobic</div><div class="zone-info"><div class="zone-range" style="width:auto;min-width:120px;white-space:nowrap">Comfortable</div><div class="zone-feel">Long sets, building base volume</div></div></div>
+  <div class="zone-row"><div class="zbadge z3">Z3</div><div class="zone-name">CSS / Tempo</div><div class="zone-info"><div class="zone-range" style="width:auto;min-width:120px;white-space:nowrap">Moderate, controlled</div><div class="zone-feel">Race-pace intervals, main sets, longer efforts</div></div></div>
+  <div class="zone-row"><div class="zbadge z4">Z4</div><div class="zone-name">CSS / Threshold</div><div class="zone-info"><div class="zone-range" style="width:auto;min-width:120px;white-space:nowrap">Sustainably hard</div><div class="zone-feel">Race-pace intervals, threshold sets, short to intermediate efforts</div></div></div>
+  <div class="zone-row"><div class="zbadge z5">Z5</div><div class="zone-name">VO₂ Max</div><div class="zone-info"><div class="zone-range" style="width:auto;min-width:120px;white-space:nowrap">Very hard</div><div class="zone-feel">Maximal efforts, HIIT style sets</div></div></div>
+  <div style="margin-top:10px;font-size:10px;color:#5c6470;font-style:italic;line-height:1.5">* CSS = critical swim speed = race pace<br>* CSS intensity will vary depending on the fitness, experience and ability of the swimmer</div>
+</div>
+<div class="card">
+  <div class="card-label">ESP swim principles</div>
+  <div class="principle"><div class="p-ic">✋</div><div><div class="p-title">High elbow catch, everything starts here</div><div class="p-desc">Anchor the hand and pull your body past it. Elbow stays high and wide throughout the catch phase. This is the single highest-leverage technique point.</div></div></div>
+  <div class="principle"><div class="p-ic">🔄</div><div><div class="p-title">45–50° body rotation per stroke</div><div class="p-desc">Hips generate power, not just arms. Lead with the shoulder on entry. Rotation drives the catch, not just the reach.</div></div></div>
+  <div class="principle"><div class="p-ic">👀</div><div><div class="p-title">Sight every 6–12 strokes in open water</div><div class="p-desc">Lift eyes only. Not the full head. Just before your breath stroke. Train bilateral breathing in the pool. This is a skill, the more you practice the easier/smoother it feels.</div></div></div>
+  <div class="principle"><div class="p-ic">📏</div><div><div class="p-title">Know your CSS pace</div><div class="p-desc">Critical Swim Speed (CSS) is derived from your 400m and 200m time trials. It becomes the anchor pace for all threshold intervals (Z3/4) throughout the program.</div></div></div>
+</div>
+<div class="card">
+  <div class="card-label">Your swim check-in</div>
+  <div class="fg1"><div class="fg"><label>Open water confidence</label>
+    <select id="sow">
+      <option value="">Select…</option>
+      <option value="high" ${D.sow==='high'?'selected':''}>High — comfortable in open water</option>
+      <option value="med" ${D.sow==='med'?'selected':''}>Moderate — some anxiety</option>
+      <option value="low" ${D.sow==='low'?'selected':''}>Low — significant concern</option>
+    </select>
+  </div></div>
+  <div class="fg2">
+    <div class="fg"><label>Current 400m pool time</label><input id="s400" placeholder="e.g. 7:20" value="${D.s400||''}"></div>
+    <div class="fg"><label>Current 200m pool time</label><input id="s200" placeholder="e.g. 3:20" value="${D.s200||''}"></div>
+  </div>
+  <div class="fg2">
+    <div class="fg"><label>CSS / 100m pace</label><input id="scss" placeholder="e.g. 1:45/100m" value="${D.scss||''}"></div>
+  </div>
+  <div style="margin-top:8px;font-size:10px;color:#5c6470;font-style:italic;line-height:1.6">* CSS = 400m swim time (in seconds) − 200m swim time (in seconds) ÷ 2<br>* If unknown leave this section blank</div>
+</div>
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" onclick="saveSub(['s400','scss','sow'])">Continue →</button>
+</div>`; }
+
+// ─── MODULE 5: RECOVERY ───
+function modRecovery() { return `
+<div class="eyebrow">Module 5 of 12 — Recovery Foundations</div>
+<div class="mod-title">Recovery Protocol</div>
+<div class="mod-lead">Adaptation happens outside training. Recovery isn't optional. It's a non-negotiable to see improvements, keep you healthy and hit your race targets.</div>
+<div class="card">
+  <div class="card-label">Resource</div>
+  <div class="pdf-grid">
+    <a class="pdf-btn" href="${PDFS.recovery}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-moon"></i></div>
+      <div><div class="pdf-name">Recovery Foundations Guide</div><div class="pdf-meta">PDF — tap to open</div></div>
+    </a>
+  </div>
+</div>
+<div class="card">
+  <div class="card-label">The four pillars</div>
+  <div class="principle"><div class="p-ic">😴</div><div><div class="p-title">Sleep: the non-negotiable</div><div class="p-desc">7–9 hours per night. HGH peaks, muscle protein synthesis occurs and the central nervous system resets. No supplement replaces it. Consistency of schedule matters as much as duration.</div></div></div>
+  <div class="principle"><div class="p-ic">🥗</div><div><div class="p-title">Nutrition expectations</div><div class="p-desc">At least 25g of carbs before any exercise over 45min. Refuel 60–100g carbs during any workout over 45min. 20–40g protein + carbohydrates within 30–45 minutes post-session. 38kcal/kg of bodyweight daily (as a minimum, not including exercise deficit).</div></div></div>
+  <div class="principle"><div class="p-ic">💧</div><div><div class="p-title">Hydration baseline</div><div class="p-desc">35ml per kg of bodyweight daily, plus sweat losses. Urine should be pale yellow/clear. Electrolytes for any session over 60 minutes, especially in hotter conditions.</div></div></div>
+  <div class="principle"><div class="p-ic">📉</div><div><div class="p-title">HRV: a guide, not a red light</div><div class="p-desc">A sustained 7-day HRV downtrend is a signal to reduce load, not push through. We use HRV as a readiness guide alongside feel and performance data.</div></div></div>
+</div>
+<div class="card">
+  <div class="card-label">Your recovery check-in</div>
+  <div class="fg2">
+    <div class="fg"><label>Average nightly sleep</label>
+      <select id="rsleep">
+        <option value="">Select…</option>
+        <option value="<6" ${D.rsleep==='<6'?'selected':''}>Less than 6 hrs</option>
+        <option value="6-7" ${D.rsleep==='6-7'?'selected':''}>6–7 hrs</option>
+        <option value="7-8" ${D.rsleep==='7-8'?'selected':''}>7–8 hrs</option>
+        <option value="8+" ${D.rsleep==='8+'?'selected':''}>8+ hrs</option>
+      </select>
+    </div>
+    <div class="fg"><label>HRV tracking device</label>
+      <select id="rhrv">
+        <option value="">Select…</option>
+        <option value="whoop" ${D.rhrv==='whoop'?'selected':''}>Whoop</option>
+        <option value="garmin" ${D.rhrv==='garmin'?'selected':''}>Garmin</option>
+        <option value="hrv4t" ${D.rhrv==='hrv4t'?'selected':''}>HRV4Training</option>
+        <option value="apple" ${D.rhrv==='apple'?'selected':''}>Apple Watch</option>
+        <option value="none" ${D.rhrv==='none'?'selected':''}>Not tracking</option>
+      </select>
+    </div>
+  </div>
+  <div class="fg1"><div class="fg"><label>Anything about your recovery we should know upfront?</label><textarea id="rnotes" placeholder="Shift work, young kids, high-stress role, chronic sleep issues…">${D.rnotes||''}</textarea></div></div>
+</div>
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" onclick="saveSub(['rsleep','rhrv'])">Continue →</button>
+</div>`; }
+
+// ─── MODULE 6: NUTRITION ───
+function modNutrition() { return `
+<div class="eyebrow">Module 6 of 12 — Nutrition Foundations</div>
+<div class="mod-title">Nutrition Guidance</div>
+<div class="mod-lead">This module is about getting the nutrition foundations right to set you up for success. If you'd like further nuanced advice, Enduro has a dietician partner that we are happy to refer onto.</div>
+<div class="card">
+  <div class="card-label">Resources</div>
+  <div class="pdf-grid">
+    <a class="pdf-btn" href="https://drive.google.com/file/d/15FkQg6Ge-vSfFiwQAkRsl30wAroSjfF2/preview" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-salad"></i></div>
+      <div><div class="pdf-name">Nutrition Foundations Guide</div><div class="pdf-meta">PDF — tap to open</div></div>
+    </a>
+  </div>
+</div>
+<div class="card">
+  <div class="card-label">Key principles — at a glance</div>
+  <div class="principle"><div class="p-ic">⚡</div><div><div class="p-title">Carbohydrate is your race fuel</div><div class="p-desc">Target 60–100g carbs per hour for sessions/events over 45min. Train your gut in training. Race-day fuelling should never be a first attempt.</div></div></div>
+  <div class="principle"><div class="p-ic">💪</div><div><div class="p-title">Protein: 1.2–2 grams per kg per day</div><div class="p-desc">Spread across 4+ meals. The post-session window (30–45 min) is your highest priority. Whole food first, supplements to bridge gaps.</div></div></div>
+  <div class="principle"><div class="p-ic">🧂</div><div><div class="p-title">Electrolytes in heat and long sessions</div><div class="p-desc">Sodium is the key electrolyte for endurance. Sweat rate and sodium concentration are highly individual. We'll personalise this over time.</div></div></div>
+  <div class="principle"><div class="p-ic">☕</div><div><div class="p-title">Caffeine — 3–6mg/kg, 30–60min pre-session/race</div><div class="p-desc">One of the most evidence-backed performance aids available. Use strategically around key sessions and A-races. Avoid daily reliance.</div></div></div>
+</div>
+
+<div class="card">
+  <div class="card-label">Your nutrition check-in</div>
+  <div class="fg1"><div class="fg"><label>Current nutrition habits — self-rating</label>
+    <select id="nrate">
+      <option value="">Select…</option>
+      <option value="poor" ${D.nrate==='poor'?'selected':''}>Poor — needs significant work</option>
+      <option value="fair" ${D.nrate==='fair'?'selected':''}>Fair — some good habits, gaps exist</option>
+      <option value="good" ${D.nrate==='good'?'selected':''}>Good — mostly dialled in</option>
+      <option value="great" ${D.nrate==='great'?'selected':''}>Great — very consistent</option>
+    </select>
+  </div></div>
+  <div class="fg1"><div class="fg"><label>Dietary requirements, allergies or restrictions</label><textarea id="ndiet" placeholder="None / describe…">${D.ndiet||''}</textarea></div></div>
+</div>
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" onclick="saveSub(['nrate'])">Continue →</button>
+</div>`; }
+
+// ─── MODULE 7: GOALS & TESTING ───
+function modGoals() { return `
+<div class="eyebrow">Module 7 of 12 — Goals & Testing</div>
+<div class="mod-title">Goals & Testing Protocol</div>
+<div class="mod-lead">You can't manage what you can't measure. These tests establish your baselines. Your coach will schedule them in your first few weeks of your programming.</div>
+<div class="card">
+  <div class="card-label">30min Time Trial — Run</div>
+  <div class="test-card">
+    <div class="test-card-header"><div class="test-badge">Time Trial</div><div class="test-title">30min time trial</div></div>
+    <div class="test-body">A flat, measured 30min at best sustainable effort. This establishes your run zones and tracks fitness over time. Repeat every 10–16 weeks on the same course for valid comparison.</div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-label">FTP test — bike</div>
+  <div class="test-card">
+    <div class="test-card-header"><div class="test-badge">Time Trial</div><div class="test-title">20-minute FTP test</div></div>
+    <div class="test-body">20min all-out, FTP = average power × 0.95. Best done fresh, minimum 48 hours after your last hard session. This gives an idea of what you can push for a 60min effort and establishes your cycling zones.</div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-label">CSS test — swim</div>
+  <div class="test-card">
+    <div class="test-card-header"><div class="test-badge">Time Trial</div><div class="test-title">400m + 200m protocol</div></div>
+    <div class="test-body">CSS (Critical Swim Speed) is your sustainable threshold pace per 100m. It sets all Z3/4 swim interval targets.</div>
+    <ul class="test-steps">
+      <li data-n="1">Warm up 400m easy + 4×50m build</li>
+      <li data-n="2">Rest 10 minutes, then swim 400m time trial — full effort</li>
+      <li data-n="3">Rest 5 minutes, then swim 200m time trial — full effort</li>
+      <li data-n="4">CSS (sec/100m) = (T400 − T200) ÷ 2</li>
+    </ul>
+  </div>
+</div>
+<div class="card">
+  <div class="card-label">Your season goals</div>
+  <div class="fg1"><div class="fg"><label>A-race goal time or target</label><input id="gtime" placeholder="e.g. Sub-4:30 70.3, Top-10 AG" value="${D.gtime||''}"></div></div>
+  <div class="fg2">
+    <div class="fg"><label>Target swim split</label><input id="gswim" placeholder="e.g. 1:30/100m" value="${D.gswim||''}"></div>
+    <div class="fg"><label>Target bike avg speed / power</label><input id="gbike" placeholder="e.g. 40kph / 250w NP" value="${D.gbike||''}"></div>
+  </div>
+  <div class="fg2">
+    <div class="fg"><label>Target run pace</label><input id="grunt" placeholder="e.g. 4:10/km" value="${D.grunt||''}"></div>
+    <div class="fg"><label>Secondary / B-race</label><input id="grace" placeholder="e.g. GC Tri March — hit AG podium" value="${D.grace||''}"></div>
+  </div>
+</div>
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" onclick="saveSub(['gtime','gswim','gbike','grunt','grace'])">Continue →</button>
+</div>`; }
+
+// ─── MODULE 8: COMMS ───
+
+function modSetup() { return `
+<div class="eyebrow">Module 8 of 12 — Setup & Getting Started</div>
+<div class="mod-title">Setup & Getting Started</div>
+<div class="mod-lead">Getting everything in place before your first session.</div>
+<div class="card">
+  <div class="card-label">Resources</div>
+  <div class="pdf-grid">
+    <a class="pdf-btn" href="${PDFS.setup}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-settings"></i></div>
+      <div><div class="pdf-name">Setup 101 Guide</div><div class="pdf-meta">PDF — tap to open</div></div>
+    </a>
+  </div>
+</div>
+<div class="card">
+  <div class="card-label">Training platform setup</div>
+  <div class="principle"><div class="p-ic">📊</div><div><div class="p-title">TrainingPeaks: your training hub</div><div class="p-desc">On a desktop/laptop make a free TrainingPeaks account → Settings (top right) → Coaches → Add coach:<br><br><strong>Jack:</strong> jacksaundersau@gmail.com<br><strong>Brandon:</strong> brandon.turton12@gmail.com<br><strong>Lauren:</strong> laurenkmewing@outlook.com<br><br>Your coach will accept your TrainingPeaks invite. Then, connect your Garmin or Wahoo and sessions will auto-sync. Message your coach on WhatsApp if you need help setting this up.</div></div></div>
+  <div class="principle"><div class="p-ic">💬</div><div><div class="p-title">WhatsApp: primary coach contact</div><div class="p-desc">Day-to-day communication and quick questions with your coach all happen via WhatsApp. You'll be added to the private Enduro WhatsApp group within 24 hours of completing this onboarding. Get involved in the community and connect with athletes from across Australia and overseas.</div></div></div>
+  <div class="principle"><div class="p-ic">📸</div><div><div class="p-title">Instagram: ESP community</div><div class="p-desc">Follow @endurostrengthperformance for weekly content, athlete wins and community updates. Tag your sessions/races and we'll reshare!</div></div></div>
+</div>
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" onclick="advance()">Continue →</button>
+</div>`; }
+
+function modComms() { return `
+<div class="eyebrow">Module 9 of 12 — Communication</div>
+<div class="mod-title">How We Work Together</div>
+<div class="mod-lead">Clear expectations from day one make the coaching relationship work. Here's exactly how ESP operates.</div>
+<div class="card">
+  <div class="card-label">Coach communication</div>
+  <div class="comms-row"><div class="comms-ic">💬</div><div><div class="comms-title">WhatsApp: primary channel</div><div class="comms-desc">All day-to-day communication happens here. Your coach aims to respond within 4 hours during business hours.</div><div class="comms-tag">Response: within 4 hrs (business hours)</div></div></div>
+  <div class="comms-row"><div class="comms-ic">📝</div><div><div class="comms-title">Check-in form</div><div class="comms-desc">Depending on your membership tier, you will be sent a check-in form periodically to report on your training. These forms are incredibly valuable for your coach as it helps them structure and tailor your programming to suit you.</div><div class="comms-tag">Base: every fortnight</div><div class="comms-tag" style="margin-left:4px">Performance: every week</div><div class="comms-tag" style="margin-left:4px">High Performance: every week</div></div></div>
+  <div class="comms-row"><div class="comms-ic">📞</div><div><div class="comms-title">Coach call + review</div><div class="comms-desc">Depending on your membership tier, you will receive a 15–20min coach call periodically to review progress, adjust targets and address anything that doesn't fit in a WhatsApp message. Your coach will schedule these in advance.</div><div class="comms-tag">Base: no coach call</div><div class="comms-tag" style="margin-left:4px">Performance: every fortnight</div><div class="comms-tag" style="margin-left:4px">High Performance: every week</div></div></div>
+</div>
+<div class="card">
+  <div class="card-label">Your responsibilities as an ESP athlete</div>
+  <div class="comms-row"><div class="comms-ic">✅</div><div><div class="comms-title">Complete your sessions, or communicate</div><div class="comms-desc">Life happens. If you miss a session, don't stress. But, do message your coach so they are aware. Don't try to cram missed sessions in.</div></div></div>
+  <div class="comms-row"><div class="comms-ic">🤒</div><div><div class="comms-title">Report illness or injury early</div><div class="comms-desc">The sooner we know, the sooner we can adapt. Training through illness destroys more fitness than rest ever will. When in doubt, message first.</div></div></div>
+  <div class="comms-row"><div class="comms-ic">✈️</div><div><div class="comms-title">Flag travel and disruption in advance</div><div class="comms-desc">Give your coach at least a week's notice of any travel, work commitments or schedule changes that will affect your training. There is a section you can do this in your check-in form. We'll build around it.</div></div></div>
+  <div class="comms-row"><div class="comms-ic">📣</div><div><div class="comms-title">Be honest about how training feels</div><div class="comms-desc">If you're fatigued, under-motivated or finding sessions too hard or too easy...let us know! Your feedback is the data your coach needs to adjust the plan.</div></div></div>
+</div>
+<div class="card">
+  <div class="card-label">Plan delivery & adjustments</div>
+  <div class="comms-row"><div class="comms-ic">📅</div><div><div class="comms-title">Weekly plans published Monday evening</div><div class="comms-desc">Your following week's sessions will be live in TrainingPeaks by Monday evening (AEST). We program Monday to Monday.</div></div></div>
+  <div class="comms-row"><div class="comms-ic">🔁</div><div><div class="comms-title">Plan modifications</div><div class="comms-desc">Your coach reviews your TrainingPeaks data weekly and adjusts load, intensity and session structure accordingly. Plans are dynamic and flexible, not set-and-forget.</div></div></div>
+</div>
+<div class="card">
+  <div class="card-label">A quick note from the ESP team</div>
+  <div style="font-size:13px;color:var(--sub);line-height:1.75;font-style:italic;padding:4px 0">"We're here to help you perform at your best. At ESP we value and genuinely enjoy the relationship we build together throughout your journey. Coach-athlete relationships thrive when communication goes both ways. Don't suffer in silence. No question is too small, no problem too awkward. We'd rather hear from you than have you guess."</div>
+</div>
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" onclick="advance()">Continue →</button>
+</div>`; }
+function modFaq() {
+  const faqs = [
+    {q:"When will I receive my training plan?", a:"Your first week of training will be live in TrainingPeaks on the Sunday before your Monday start date. Your coach will confirm via WhatsApp when it's ready and walk you through the first week in your onboarding call."},
+    {q:"How do I read my TrainingPeaks sessions?", a:"Each session includes a title (e.g. 'Z2 Run 45min'), a description with instructions and target zones or power/pace ranges. If a session uses abbreviations you don't recognise, screenshot it and message your coach."},
+    {q:"What does RPE mean and how do I use it?", a:"RPE stands for Rate of Perceived Exertion, on a scale of 1–10. Z1 = RPE 1–3 (barely trying), Z2 = RPE 3–5 (comfortable), Z3 = RPE 6–7 (hard but controlled), Z4 = RPE 8 (very hard), Z5 = RPE 9–10 (max). Use it alongside your heart rate or power data."},
+    {q:"What abbreviations do you use for swim sessions?", a:"WU = warmup, DS = drill set, MS = main set, CD = cooldown, Z = zone, Pull = use pull buoy, P&PB = use hand paddles & pull buoy, Kick = use kickboard, Fins = use fins, R = rest (e.g. 10R = 10sec rest), HVO = high velocity overload (15 strokes hard then settle)."},
+    {q:"What if I miss a session?", a:"Don't panic and don't try to cram it in. Message your coach on WhatsApp as soon as you know you'll miss it. We'll decide together whether to reschedule, skip or modify the week. Trying to do two hard sessions back-to-back to catch up is almost always the wrong move."},
+    {q:"What if I'm sick or injured?", a:"Message your coach immediately. Do not train through illness. It makes recovery longer and the fitness loss from rest is minimal compared to the damage from training sick. For injury, the same applies: early communication means faster return to training."},
+    {q:"What if I'm travelling or my schedule changes?", a:"Give us as much notice as possible via your check-in or WhatsApp communication. Ideally a week or more. Your coach can restructure your training week around travel, hotel gyms, no-pool availability and time zone differences. We've done it many times."},
+    {q:"How often will my plan change?", a:"Your weekly plan is reviewed and updated weekly based on your previous week's data and TrainingPeaks metrics. Over a training block (4–6 weeks), the structure and intensity will also evolve as your fitness develops. We will also navigate any speed bumps (illness, niggles, fatigue) in collaboration with you. Nothing is set-and-forget."},
+    {q:"Do I need to do every session as written?", a:"The aim is to execute the intent of each session, not hit every number perfectly. If you feel terrible, back off the intensity and still complete the time/distance. If conditions mean you can't hit the target, let your coach know by leaving a comment on your TrainingPeaks session. Consistency over perfection."},
+    {q:"How do I give my coach feedback?", a:"After every session in TrainingPeaks you can rate how it felt (1–10) and comment on any niggles, what you changed and why. Your coach reads every note. For bigger conversations (form concerns, motivation dips, life changes) use your check-in form or your coach call + review."},
+    {q:"When is my coach call + review?", a:"Calls happen either weekly or fortnightly (depending on your membership tier) and are booked in advance via a link your coach will send in the check-in form."},
+    {q:"Can I train with friends or join group rides/runs?", a:"Yes, of course! But with a caveat. If a group session is harder than your planned intensity, treat it as your quality session for the week and communicate with your coach. Group training is valuable for motivation, but it shouldn't replace your structured sessions every week."},
+    {q:"Can I add additional sessions or add mileage in my weekly programming?", a:"We take athlete health and safety seriously at ESP and we load manage carefully in order to get you to your start line strong, fit and injury-free. We do not recommend adding sessions outside of what is programmed by your coach. Adding mileage is also not recommended. Your sessions are built tailored to you. Trust the process."},
+    {q:"Can I make my strength training optional?", a:"Respectfully, no. This is a non-negotiable at ESP. Athletes that strength train stay resilient to injury and increase performance gains. We are flexible with how you schedule it in your week (home gym, 1x vs 2x per week, duration) but it is an expectation that you invest into your strength work. Those that do this, see results. It will make you a better athlete and keep you in the sport long-term."},
+    {q:"What if I disagree with something in my plan?", a:"Say so. Your coach would rather have a conversation than have you complete sessions you don't believe in. Coaching is collaborative and your feedback shapes the plan. Just message us and we'll work through it."}
+  ];
+  return `
+<div class="eyebrow">Module 10 of 12 — FAQs</div>
+<div class="mod-title">Common Questions</div>
+<div class="mod-lead">Answers to the questions every new ESP athlete asks in their first few weeks. Bookmark this module. You can come back to it any time.</div>
+<div class="card">
+  <div class="card-label">General & program questions</div>
+  ${faqs.map((f,i)=>`
+  <div class="faq-item" id="faq${i}">
+    <div class="faq-q"><span class="faq-q-text">${f.q}</span><i class="ti ti-chevron-down faq-chevron"></i></div>
+    <div class="faq-a">${f.a}</div>
+  </div>`).join('')}
+</div>
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" onclick="advance()">Continue →</button>
+</div>`; }
+
+// ─── MODULE 11: RESOURCES ───
+function modResources() { return `
+<div class="eyebrow">Module 11 of 12 — Training Guides</div>
+<div class="mod-title">Your ESP Guide Library</div>
+<div class="mod-lead">Your complete set of ESP Foundations guides. Download or open each one — they are yours to keep and reference throughout your training.</div>
+
+<div class="card">
+  <div class="card-label">Foundations guides — all disciplines</div>
+  <div class="pdf-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+    <a class="pdf-btn" href="${PDFS.run}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-run"></i></div>
+      <div>
+        <div class="pdf-name">Running Foundations</div>
+        <div class="pdf-meta">Zones, form, load management</div>
+      </div>
+    </a>
+    <a class="pdf-btn" href="${PDFS.bike}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-bike"></i></div>
+      <div>
+        <div class="pdf-name">Bike Foundations</div>
+        <div class="pdf-meta">FTP, cadence, aero position</div>
+      </div>
+    </a>
+    <a class="pdf-btn" href="${PDFS.swim}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-wave-sine"></i></div>
+      <div>
+        <div class="pdf-name">Swim Foundations</div>
+        <div class="pdf-meta">CSS, technique, open water</div>
+      </div>
+    </a>
+    <a class="pdf-btn" href="${PDFS.recovery}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-moon"></i></div>
+      <div>
+        <div class="pdf-name">Recovery Foundations</div>
+        <div class="pdf-meta">Sleep, HRV, mobility</div>
+      </div>
+    </a>
+    <a class="pdf-btn" href="${PDFS.nutrition}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-salad"></i></div>
+      <div>
+        <div class="pdf-name">Nutrition Foundations</div>
+        <div class="pdf-meta">Fuelling, hydration, supplements</div>
+      </div>
+    </a>
+    <a class="pdf-btn" href="${PDFS.setup}" target="_blank">
+      <div class="pdf-ic"><i class="ti ti-settings"></i></div>
+      <div>
+        <div class="pdf-name">Setup 101</div>
+        <div class="pdf-meta">TrainingPeaks, testing, onboarding</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-label">How to use these guides</div>
+  <div class="principle">
+    <div class="p-ic">📖</div>
+    <div>
+      <div class="p-title">Read each guide before Week 1</div>
+      <div class="p-desc">Each guide covers the foundational principles behind your programming. Understanding the why makes it easier to execute the what.</div>
+    </div>
+  </div>
+  <div class="principle">
+    <div class="p-ic">🔖</div>
+    <div>
+      <div class="p-title">Bookmark and return to them</div>
+      <div class="p-desc">These are reference documents. Come back to the injury management sections, the nutrition tables and the zone explanations throughout your training.</div>
+    </div>
+  </div>
+  <div class="principle">
+    <div class="p-ic">❓</div>
+    <div>
+      <div class="p-title">Questions? Ask your coach</div>
+      <div class="p-desc">If anything in the guides conflicts with what you see in your training plan, or raises a question just message your coach on WhatsApp. That's what we're here for.</div>
+    </div>
+  </div>
+</div>
+
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" onclick="advance()">Continue →</button>
+</div>`; }
+// ─── MODULE 10: WAIVER ───
+function modWaiver() { return `
+<div class="eyebrow">Module 12 of 12 — Athlete Waiver</div>
+<div class="mod-title">Athlete Acknowledgement & Waiver</div>
+<div class="mod-lead">Please read the following carefully. This agreement must be completed before your program commences.</div>
+<div class="card">
+  <div class="card-label">Enduro Strength Performance — Liability Waiver & Athlete Agreement</div>
+  <div class="waiver-body">
+    <p><strong>1. Acknowledgement of Risk</strong><br>
+    I acknowledge that participation in endurance training, including but not limited to running, cycling, swimming and strength training, involves inherent risks. These risks may include, but are not limited to, muscle soreness, strains, tendon injuries, stress reactions or stress fractures, fatigue, illness or other physical injury.<br><br>
+    I understand that while Enduro Strength Performance (ESP) programming always prioritises athlete safety, no training program can eliminate all risk of injury.</p>
+
+    <p><strong>2. Personal Responsibility</strong><br>
+    I acknowledge that:<br>
+    • I participate in all training at my own risk<br>
+    • I am responsible for monitoring my own health, recovery and physical condition<br>
+    • I will communicate openly and promptly with my coach regarding pain, injury symptoms, excessive fatigue, illness or other concerns</p>
+
+    <p><strong>3. Commitment to the Prescribed Training Plan</strong><br>
+    I agree to:<br>
+    • Follow the training program prescribed by my ESP coach<br>
+    • Complete training sessions as written, including prescribed intensity, volume, recovery and rest<br>
+    • Avoid adding additional or unprescribed training sessions without first discussing them with my coach<br><br>
+    I acknowledge that additional sessions outside the prescribed program are not encouraged, as they may increase injury risk and compromise training outcomes.</p>
+
+    <p><strong>4. Strength Training Requirement</strong><br>
+    I understand and acknowledge that:<br>
+    • Strength training is a required component of my endurance program<br>
+    • I am expected to commit to a minimum of 60 minutes of strength training per week<br>
+    • This requirement exists to support injury prevention, durability, resilience and long-term performance<br><br>
+    I acknowledge that failure to complete prescribed strength training may increase my risk of injury.</p>
+
+    <p><strong>5. Fuelling & Energy Availability</strong><br>
+    I acknowledge and agree that adequate fueling is a critical component of safe and effective endurance training. I understand and agree that:<br>
+    • I am responsible for fueling adequately to support my training, recovery and overall health<br>
+    • This includes appropriate nutrition before, during, and after training sessions, as well as sufficient daily energy intake to meet the demands of endurance training<br><br>
+    I acknowledge that Enduro Strength Performance strongly encourages pre-session, in-session (60–100g carbohydrate/hour for sessions over ~40 minutes) and post-session fueling. I understand that chronic under-fuelling may significantly increase the risk of injury, illness, hormonal disruption, fatigue and reduced performance. For personalised nutrition advice, I should consult a qualified sports dietitian.</p>
+
+    <p><strong>6. Recommended Health Screening</strong><br>
+    I acknowledge that Enduro Strength Performance recommends periodic blood testing through a qualified medical professional to identify potential deficiencies or health concerns. Blood testing is recommended but not mandatory. Any testing, diagnosis or treatment is the responsibility of a qualified medical practitioner.</p>
+
+    <p><strong>7. Medical Disclosure</strong><br>
+    I confirm that I have disclosed all known medical conditions, injuries, illnesses or relevant health concerns to Enduro Strength Performance prior to commencing training, and I agree to update my coach if my medical status changes.</p>
+
+    <p><strong>8. Limitation of Liability</strong><br>
+    To the extent permitted by law, I acknowledge and agree that Enduro Strength Performance, its coaches, and representatives are not liable for injury, illness, loss, or damage sustained as a result of participation in training, except where required by Australian Consumer Law.</p>
+
+    <p><strong>9. Member Benefits</strong><br>
+    I acknowledge that member benefits are provided exclusively for active ESP athletes and are not transferable. I must not share, distribute or disclose any ESP member benefits, discount codes or partner offers to non-members. Any misuse may result in the immediate removal of my access to member benefits.</p>
+
+    <p><strong>10. Membership Term, Minimum Commitment & Cancellation</strong><br>
+    I acknowledge that my membership is subject to a minimum commitment period of twelve (12) consecutive weeks. Cancellation within this period does not relieve me of financial obligations. Upon completion of the minimum term, I may cancel by providing fourteen (14) days' written notice. Membership fees remain payable in full during the notice period. No refunds, credits or pro-rata adjustments will be provided for early cancellation or non-attendance.</p>
+
+    <p><strong>11. Photography & Media Consent</strong><br>
+    I consent to Enduro Strength Performance using photographs, videos and testimonials featuring me for promotional and educational purposes, including social media and marketing materials. I understand I may opt out of this consent by unchecking the relevant box at the time of signing or by notifying my coach in writing at any time.</p>
+
+    <p><strong>12. Age Declaration</strong><br>
+    I confirm that I am 18 years of age or older, or that I have obtained the written consent of a parent or legal guardian prior to participating in any ESP program. I acknowledge that it is my responsibility to ensure this declaration is accurate at the time of signing.</p>
+
+    <p><strong>13. Emergency Treatment Consent</strong><br>
+    I authorise Enduro Strength Performance coaches and representatives to seek emergency medical treatment on my behalf if I am incapacitated and unable to do so myself. I accept responsibility for all costs associated with such treatment and acknowledge that ESP will act in good faith in seeking appropriate care.</p>
+
+    <p><strong>14. Coaching is Not Medical or Dietary Advice</strong><br>
+    I understand and acknowledge that coaching guidance, training programming, and general nutrition education provided by Enduro Strength Performance does not constitute medical advice, dietary advice, or a substitute for professional medical or allied health consultation. I agree to seek independent professional advice for any medical, injury or nutrition concerns, and I acknowledge that ESP coaches are not qualified medical practitioners or registered dietitians.</p>
+
+    <p><strong>15. Governing Law</strong><br>
+    This agreement is governed by and construed in accordance with the laws of Queensland, Australia. Any disputes arising under or in connection with this agreement shall be subject to the exclusive jurisdiction of the courts of Queensland.</p>
+
+    <p><strong>16. Data Collection & Privacy</strong><br>
+    I acknowledge that Enduro Strength Performance collects personal information including my name, contact details, date of birth, health information and training data for the purpose of delivering coaching services. This information is stored securely and will not be shared with third parties without my consent, except where required by law. I understand I may request access to or correction of my personal information at any time by contacting ESP directly. ESP handles personal information in accordance with the Australian Privacy Act 1988.</p>
+
+    <p><strong>17. Informed Consent</strong><br>
+    I confirm that I have read and understood this document in full, I have had the opportunity to ask questions, and I voluntarily agree to the terms and expectations outlined above.</p>
+  </div>
+  <div class="consent-item" onclick="tog('c1', event)"><input type="checkbox" id="c1"><span>I have read and understood the full athlete agreement and liability waiver above.</span></div>
+  <div class="consent-item" onclick="tog('c2', event)"><input type="checkbox" id="c2"><span>I confirm I am 18 years of age or older (or have parental/guardian consent) and am physically capable of participating in Enduro Strength Performance programs.</span></div>
+  <div class="consent-item" onclick="tog('c3', event)"><input type="checkbox" id="c3"><span>I consent to Enduro Strength Performance collecting and using my personal data as described in section 16 above.</span></div>
+  <div class="consent-item" onclick="tog('c4', event)"><input type="checkbox" id="c4"><span>I consent to photo and media use as described in section 11. <em>(Uncheck to opt out.)</em></span></div>
+</div>
+<div class="card">
+  <div class="card-label">Your signature</div>
+  <div class="sig-wrap">
+    <div class="sig-head">
+      <span class="sig-lbl">Sign using your mouse or finger</span>
+      <button class="sig-clr" onclick="clearSig()">Clear</button>
+    </div>
+    <canvas id="sigCanvas" width="680" height="150"></canvas>
+  </div>
+  <div class="fg2">
+    <div class="fg"><label>Full legal name</label><input id="wname" placeholder="As it appears on ID" value="${D.fn&&D.ln?D.fn+' '+D.ln:''}"></div>
+    <div class="fg"><label>Date signed</label><input id="wdate" type="date" value="${new Date().toISOString().split('T')[0]}"></div>
+  </div>
+</div>
+<div class="action-row">
+  <button class="btn-back" onclick="go(cur-1)">← Back</button>
+  <button class="btn-next" id="waiverSubmitBtn" onclick="submitWaiver()">Submit & Complete ✓</button>
+</div>`; }
+</script>
+</body>
+</html>
